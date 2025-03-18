@@ -6,7 +6,8 @@
     "react-router-dom": "npm:react-router-dom@^6.26.2"
   },
   "compilerOptions": {
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
   },
   "nodeModulesDir": "auto"
 }
