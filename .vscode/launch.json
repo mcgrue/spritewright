@@ -18,6 +18,21 @@
       "console": "integratedTerminal"
     },
     {
+      "name": "Deno Test Debug All",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "test",
+        "--inspect-brk",
+        "--allow-read",
+        "--allow-write",
+        "--allow-net"
+      ],
+      "attachSimplePort": 9229,
+      "console": "integratedTerminal"
+    },
+    {
       "name": "Attach to Backend",
       "type": "node",
       "request": "attach",
