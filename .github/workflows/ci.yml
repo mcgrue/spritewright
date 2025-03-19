@@ -46,6 +46,19 @@ jobs:
           
       - name: Transfer build artifacts
         run: |
-          scp -r dist/* ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.FRONTEND_DEPLOY_PATH }}
-          scp -r . ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.BACKEND_DEPLOY_PATH }}
+          echo "cleaning up stage"
+          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "rm -rf ~/spritewright || true"
+          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "mkdir ~/spritewright"
+          
+          echo "uploading to stage"
+          scp -r dist/* ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/spritewright/front
+          scp -r . ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/spritewright/back
+
+          echo "deleting production"
+          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "rm -rf ${{ secrets.FRONTEND_DEPLOY_PATH }}/*"
+          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "rm -rf ${{ secrets.BACKEND_DEPLOY_PATH }}/*"
+
+          echo "copying to production"
+          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "cp -r ~/spritewright/front/* ${{ secrets.FRONTEND_DEPLOY_PATH }}"
+          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "cp -r ~/spritewright/back/* ${{ secrets.BACKEND_DEPLOY_PATH }}"
 
