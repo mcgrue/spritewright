@@ -51,8 +51,8 @@ jobs:
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "mkdir ~/spritewright"
           
           echo "uploading to stage"
-          scp -rv dist/* ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/spritewright/front
-          scp -rv ./* ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/spritewright/back
+          scp -r dist/* ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/spritewright/front
+          scp -r ./* ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/spritewright/back
 
           echo "deleting production"
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "rm -rf ${{ secrets.FRONTEND_DEPLOY_PATH }}/*"
