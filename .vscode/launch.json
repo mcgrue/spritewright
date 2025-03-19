@@ -9,9 +9,7 @@
       "runtimeArgs": [
         "test",
         "--inspect-brk",
-        "--allow-read",
-        "--allow-write",
-        "--allow-net",
+        "--allow-all",
         "${file}"
       ],
       "attachSimplePort": 9229,
@@ -25,9 +23,7 @@
       "runtimeArgs": [
         "test",
         "--inspect-brk",
-        "--allow-read",
-        "--allow-write",
-        "--allow-net"
+        "--allow-all"
       ],
       "attachSimplePort": 9229,
       "console": "integratedTerminal"
