@@ -37,6 +37,30 @@ jobs:
       - name: Fail if there are any .ts or .tsx files in the project without a .test.ts or .test.tsx file
         shell: pwsh
         run: ./scripts/check-test-files.ps1
+      
+      - name: Fail if required shiboleths for replacement are missing
+        shell: pwsh
+        run: |
+          # fail if GIT_VERSION_REPLACED_BY_CI_DO_NOT_CHANGE or DEPLOY_TIMESTAMP_REPLACED_BY_CI_DO_NOT_CHANGE are missing from backend/constants.ts
+          $content = Get-Content "backend/constants.ts" -Raw
+          if (-not ($content -match "GIT_VERSION_REPLACED_BY_CI_DO_NOT_CHANGE" -and $content -match "DEPLOY_TIMESTAMP_REPLACED_BY_CI_DO_NOT_CHANGE")) {
+              Write-Error "Required replacement tokens are missing from backend/constants.ts"
+              exit 1
+          }
+
+      - name: Replace ci variables 
+        shell: pwsh
+        run: |
+          # replace GIT_VERSION_REPLACED_BY_CI_DO_NOT_CHANGE in backend/constants.ts with the 7-digit git sha
+          $content = Get-Content "backend/constants.ts" -Raw
+          $gitSha = "${{ github.sha }}".Substring(0,7)
+          $newContent = $content -replace "GIT_VERSION_REPLACED_BY_CI_DO_NOT_CHANGE", $gitSha
+          Set-Content "backend/constants.ts" $newContent
+          
+          # replace DEPLOY_TIMESTAMP_REPLACED_BY_CI_DO_NOT_CHANGE in backend/constants.ts with the ISO timestamp for now
+          $timestamp = [DateTime]::UtcNow.ToString("o")
+          $newContent = $newContent -replace "DEPLOY_TIMESTAMP_REPLACED_BY_CI_DO_NOT_CHANGE", $timestamp
+          Set-Content "backend/constants.ts" $newContent
 
       - name: Install SSH key
         uses: shimataro/ssh-key-action@v2
@@ -44,6 +68,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
           if_key_exists: "ignore"
+
       - name: Transfer build artifacts
         run: |
           echo "cleaning up stage"

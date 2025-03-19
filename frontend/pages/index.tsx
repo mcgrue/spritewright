@@ -1,5 +1,4 @@
 // @ts-ignore: ts(6133)
-import React from "react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Dino } from "../types.ts";
@@ -17,7 +16,7 @@ export default function Index() {
 
   return (
     <main>
-      <h1>Welcome to the Dinosaur app</h1>
+      <h1>Welcome to the Redeployed app</h1>
       <p>Click on a dinosaur below to learn more.</p>
       {dinosaurs.map((dinosaur: Dino) => {
         return (

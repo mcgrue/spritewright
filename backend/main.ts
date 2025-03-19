@@ -5,7 +5,11 @@ import {
   deleteFileIfExists,
 } from "../deno-common/file.ts";
 import { getFirstAvailablePort } from "../deno-common/net.ts";
-import { BACKEND_PORT_FILE } from "./constants.ts";
+import {
+  BACKEND_PORT_FILE,
+  DEPLOY_TIMESTAMP,
+  GIT_VERSION,
+} from "./constants.ts";
 import data from "./data.json" with { type: "json" };
 
 await deleteFileIfExists(BACKEND_PORT_FILE);
@@ -29,6 +33,13 @@ try {
   // deno-lint-ignore no-explicit-any
   router.get("/api/dinosaurs", (context: any) => {
     context.response.body = data;
+  });
+
+  router.get("/api/version", (context) => {
+    context.response.body = {
+      "SHA": GIT_VERSION,
+      "TIME_DEPLOYED": DEPLOY_TIMESTAMP,
+    };
   });
 
   // deno-lint-ignore no-explicit-any
