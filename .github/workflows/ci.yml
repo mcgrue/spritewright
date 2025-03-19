@@ -49,9 +49,7 @@ jobs:
           echo "cleaning up stage"
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "rm -rf ~/spritewright || true"
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "mkdir ~/spritewright || true"
-          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "mkdir ~/spritewright/front || true"
-          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "mkdir ~/spritewright/back || true"
-          
+         
           echo "uploading to stage"
           scp -r dist/* ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/spritewright/front
           rsync -av --exclude-from='.gitignore' ./* ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/spritewright/back
@@ -62,6 +60,9 @@ jobs:
           echo "deleting production"
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "rm -rf ${{ secrets.FRONTEND_DEPLOY_PATH }}/*"
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "rm -rf ${{ secrets.BACKEND_DEPLOY_PATH }}/*"
+
+          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "mkdir ${{ secrets.FRONTEND_DEPLOY_PATH }} || true"
+          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "mkdir ${{ secrets.BACKEND_DEPLOY_PATH }} || true"
 
           echo "copying to production"
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "cp -r ~/spritewright/front/* ${{ secrets.FRONTEND_DEPLOY_PATH }}"
