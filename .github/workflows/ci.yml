@@ -54,6 +54,9 @@ jobs:
           scp -r dist/* ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/spritewright/front
           rsync -av --exclude-from='.gitignore' ./* ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/spritewright/back
 
+          echo "stopping service"
+          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "sudo systemctl stop spritewright.service"
+
           echo "deleting production"
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "rm -rf ${{ secrets.FRONTEND_DEPLOY_PATH }}/*"
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "rm -rf ${{ secrets.BACKEND_DEPLOY_PATH }}/*"
@@ -62,7 +65,6 @@ jobs:
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "cp -r ~/spritewright/front/* ${{ secrets.FRONTEND_DEPLOY_PATH }}"
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "cp -r ~/spritewright/back/* ${{ secrets.BACKEND_DEPLOY_PATH }}"
 
-          echo "restarting service"
-          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "sudo systemctl stop spritewright.service"
+          echo "starting service"
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "sudo systemctl start spritewright.service"
 
