@@ -97,7 +97,9 @@ jobs:
               ((elapsed++))
             done
           "
-
+          
+          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "ps aux | grep deno"
+          
           echo "deleting production"
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "rm -rf ${{ secrets.FRONTEND_DEPLOY_PATH }}/*"
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "rm -rf ${{ secrets.BACKEND_DEPLOY_PATH }}/*"
