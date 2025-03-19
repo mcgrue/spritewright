@@ -5,6 +5,9 @@ import { Dino } from "../types.ts";
 
 export default function Index() {
   const [dinosaurs, setDinosaurs] = useState<Dino[]>([]);
+  const [version, setVersion] = useState<
+    { SHA: string; TIME_DEPLOYED: string } | null
+  >(null);
 
   useEffect(() => {
     (async () => {
@@ -14,9 +17,19 @@ export default function Index() {
     })();
   }, []);
 
+  useEffect(() => {
+    (async () => {
+      const response = await fetch(`/api/version`);
+      const versionInfo = await response.json();
+      setVersion(versionInfo);
+    })();
+  }, []);
+
+  // get the version from /api/version
+
   return (
     <main>
-      <h1>Welcome to the Test app</h1>
+      <h1>Welcome to the Test app {version?.SHA}</h1>
       <p>Click on a dinosaur below to learn more.</p>
       {dinosaurs.map((dinosaur: Dino) => {
         return (

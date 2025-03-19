@@ -31,8 +31,8 @@ jobs:
       - name: Build step
         run: |
           deno task build
-          chmod -R g+w *  
-          chmod -R g+w .* 
+          chmod -R g+w *
+          chmod -R g+w .*
       
       - name: Test step
         run: "yarn test"
