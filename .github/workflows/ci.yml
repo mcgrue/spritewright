@@ -83,6 +83,20 @@ jobs:
 
           echo "stopping service"
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "sudo systemctl stop spritewright.service"
+          
+          echo "waiting for service to stop (timeout 1 minute)"
+          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "
+            timeout=60
+            elapsed=0
+            while systemctl is-active --quiet spritewright.service; do
+              if [ $elapsed -ge $timeout ]; then
+                echo "Service failed to stop within 1 minute timeout" >&2
+                exit 1
+              fi
+              sleep 1
+              ((elapsed++))
+            done
+          "
 
           echo "deleting production"
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "rm -rf ${{ secrets.FRONTEND_DEPLOY_PATH }}/*"
