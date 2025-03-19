@@ -1,0 +1,37 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-vcs-permalinks
+      - id: end-of-file-fixer
+        exclude: "tests/((commands|data|providers/test_uv_provider)/|test_).+"
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+        exclude: '\.svg$'
+      - id: debug-statements
+      - id: no-commit-to-branch
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-yaml
+        args: ["--unsafe"] # for mkdocs.yml
+      - id: detect-private-key
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.1
+    hooks:
+      - id: codespell
+        name: Run codespell to check for common misspellings in files
+        # config section is within pyproject.toml
+        language: python
+        types: [text]
+        args: ["--write-changes"]
+        additional_dependencies:
+          - tomli
+
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.4.1 # automatically updated by Commitizen
+    hooks:
+      - id: commitizen
+      - id: commitizen-branch
+        stages:
+          - post-commit
