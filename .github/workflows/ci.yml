@@ -80,7 +80,7 @@ jobs:
          
           echo "uploading to stage"
           scp -r dist/* ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/spritewright/front
-          rsync -av --exclude-from='.gitignore' ./* ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/spritewright/back
+          rsync -av ./* ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/spritewright/back
 
           echo "stopping service"
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "sudo systemctl stop spritewright.service"
