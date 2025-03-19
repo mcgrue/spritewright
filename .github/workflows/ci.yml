@@ -30,8 +30,9 @@ jobs:
 
       - name: Build step
         run: |
-          umask 0002  # This sets newly created files to have group write permissions
           deno task build
+          chmod -R g+w *  
+          chmod -R g+w .* 
       
       - name: Test step
         run: "yarn test"
