@@ -29,7 +29,9 @@ jobs:
           deno-version: v2.x
 
       - name: Build step
-        run: "deno task build"
+        run: |
+          umask 0002  # This sets newly created files to have group write permissions
+          deno task build
       
       - name: Test step
         run: "yarn test"
@@ -92,7 +94,7 @@ jobs:
           echo "copying to production"
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "cp -r ~/spritewright/front/* ${{ secrets.FRONTEND_DEPLOY_PATH }}"
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "cp -r ~/spritewright/back/* ${{ secrets.BACKEND_DEPLOY_PATH }}"
-
+          
           echo "starting service"
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "sudo systemctl start spritewright.service"
 
