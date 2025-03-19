@@ -43,6 +43,7 @@ jobs:
         with:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+					if_key_exists: "ignore"
           
       - name: Transfer build artifacts
         run: |
