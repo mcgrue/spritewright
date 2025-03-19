@@ -29,7 +29,7 @@ export default function Index() {
 
   return (
     <main>
-      <h1>Welcome to the Test app?! {version?.SHA}</h1>
+      <h1>Welcome to the Test app?!?!?!! {version?.SHA}</h1>
       <p>Click on a dinosaur below to learn more.</p>
       {dinosaurs.map((dinosaur: Dino) => {
         return (
