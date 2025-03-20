@@ -1,6 +1,7 @@
 [
 	"backend/util/routeStaticFilesFrom.ts",
 	"backend/constants.ts",
+	"backend/env_vars.ts",
 	"backend/main.ts",
 	"frontend/pages/Dinosaur.tsx",
 	"frontend/pages/index.tsx",
