@@ -61,9 +61,13 @@ export const validateEnvData = (contents: string): Record<string, string> => {
 let _env: Record<string, string> = {};
 
 export const parse = async (
-  filePath: string,
+  filePath: string | undefined,
 ): Promise<Record<string, string>> => {
   const parseDotEnvIfPresent = async (): Promise<Record<string, string>> => {
+    if (!filePath) {
+      return {};
+    }
+
     // if there's a .env file in the project's base directory, load it
     if (await exists(filePath)) {
       console.log(`found ${filePath} file: loading...`);
@@ -119,6 +123,24 @@ export const parse = async (
   });
 
   return _env;
+};
+
+/**
+ * Initializes the env vars from: a) the .env file specified in `name` and b) the system environment.
+ * 1. Prefers system environment over .env file entries
+ * 2. the `name` provided shouldn't be in the env_vars.ts list
+ *
+ * @param name
+ * @returns
+ */
+export const init = (name: EnvVarName): void => {
+  const envFile = Deno.env.get(name);
+
+  if (!envFile) {
+    console.error(`Env var '${name}' not found. Skipping .env file parsing.`);
+  }
+
+  parse(envFile);
 };
 
 // export const get(name: EnvVarName): string {

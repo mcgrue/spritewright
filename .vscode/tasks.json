@@ -20,6 +20,11 @@
         "reveal": "always"
       },
       "isBackground": true,
+      "options": {
+        "env": {
+          "SPRITEWRIGHT_ENV_FILE": ".env"
+        }
+      },
       "problemMatcher": {
         "pattern": {
           "regexp": "^\\[\\d+\\] found available backend port: (\\d+)$",

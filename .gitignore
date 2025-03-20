@@ -1,6 +1,8 @@
 .port_backend
 .port_frontend
 
+.env
+
 # Logs
 logs
 *.log

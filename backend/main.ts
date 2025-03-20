@@ -10,6 +10,11 @@ import {
   DEPLOY_TIMESTAMP,
   GIT_VERSION,
 } from "./constants.ts";
+
+import { init as envInit } from "./env.ts";
+
+envInit("SPRITEWRIGHT_ENV_FILE");
+
 import data from "./data.json" with { type: "json" };
 
 await deleteFileIfExists(BACKEND_PORT_FILE);
