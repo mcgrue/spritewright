@@ -16,12 +16,20 @@ repos:
         args: ["--unsafe"] # for mkdocs.yml
       - id: detect-private-key
 
+  - repo: local
+    hooks:
+      - id: check-test-files
+        name: Check test files exist
+        entry: powershell -NonInteractive -NoProfile -Command "& {./scripts/check-test-files.ps1 *>&1 | Select-Object -Last 1; exit $LASTEXITCODE}"
+        language: system
+        pass_filenames: false
+        types: [file]
+
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.1
     hooks:
       - id: codespell
         name: Run codespell to check for common misspellings in files
-        # config section is within pyproject.toml
         language: python
         types: [text]
         args: ["--write-changes"]
@@ -29,7 +37,7 @@ repos:
           - tomli
 
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.4.1 # automatically updated by Commitizen
+    rev: v4.4.1
     hooks:
       - id: commitizen
       - id: commitizen-branch
