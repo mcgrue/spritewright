@@ -29,13 +29,19 @@ jobs:
         with:
           deno-version: v2.x
 
+      - name: use actions--context
+        uses: qoomon/actions--context@v4
+
       - name: Set outputs
         id: vars
-        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+        run: |
+          echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "github_job_id=${GITHUB_JOB_ID}" >> $GITHUB_OUTPUT
 
       - name: Verify shortcode
         run: |
           echo ${{ steps.vars.outputs.sha_short }}
+          echo ${{ steps.vars.outputs.github_job_id }}
 
       - name: Build step
         run: |
@@ -108,27 +114,46 @@ jobs:
             done
           "
 
-          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "ps aux | grep deno"
+      - name: Restarting service
+        run: |
+          echo "Restarting service"
+          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "sudo /home/deno-user/flip_spritewrite.com.sh"
 
-          echo "deleting production"
-          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "sudo rm -rf ${{ secrets.BASE_DEPLOY_PATH }}"
+      - name: Verify deployment
+        shell: pwsh
+        run: |
+          Write-Host "Waiting for deployment to be live with SHA: ${{ steps.vars.outputs.sha_short }}"
+          $timeout = 60
+          $elapsed = 0
 
-          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "mkdir ${{ secrets.FRONTEND_DEPLOY_PATH }} || true"
-          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "mkdir ${{ secrets.BACKEND_DEPLOY_PATH }} || true"
+          while ($elapsed -lt $timeout) {
+            try {
+              $response = Invoke-RestMethod -Uri "https://spritewright.com/api/version" -Method Get
+              if ($response.SHA -eq "${{ steps.vars.outputs.sha_short }}") {
+                Write-Host "Deployment verified! New version is live."
+                exit 0
+              }
+            } catch {
+              # Ignore errors and continue polling
+            }
 
-          echo "copying to production"
-          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "cp -r ~/spritewright/front/* ${{ secrets.FRONTEND_DEPLOY_PATH }}"
-          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "cp -r ~/spritewright/back/* ${{ secrets.BACKEND_DEPLOY_PATH }}"
+            Write-Host "Waiting for deployment to be live (${elapsed}s/${timeout}s)..."
+            Start-Sleep -Seconds 2
+            $elapsed += 2
+          }
 
-          echo "starting service"
-          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "sudo systemctl start spritewright.service"
+          Write-Error "Timeout waiting for deployment to be verified"
+          exit 1
 
-      - name: Notify Discord
+      - name: Send Discord Notification
         if: always()
+        shell: bash
         run: |
           STATUS_COLOR=$([ "${{ job.status }}" == "success" ] && echo "3066993" || echo "15158332")
           STATUS_EMOJI=$([ "${{ job.status }}" == "success" ] && echo "✅" || echo "❌")
           STATUS_TEXT=$([ "${{ job.status }}" == "success" ] && echo "Deploy Successful - https://spritewright.com/" || echo "Deploy Failed")
+          STATUS_LINK_TITLE=$([ "${{ job.status }}" == "success" ] && echo "Github Link" || echo "Failed Action")
+          STATUS_LINK_HREF=$([ "${{ job.status }}" == "success" ] && echo "${{ github.event.head_commit.url }}" || echo "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/job/${{ steps.vars.outputs.github_job_id }}")
 
           curl -X POST -H "Content-Type: application/json" \
           -d "{
@@ -144,8 +169,8 @@ jobs:
                   \"inline\": true
                 },
                 {
-                  \"name\": \"Github Link\",
-                  \"value\": \"${{ github.event.head_commit.url }}\",
+                  \"name\": \"$STATUS_LINK_TITLE\",
+                  \"value\": \"$STATUS_LINK_HREF\",
                   \"inline\": true
                 }
               ]
