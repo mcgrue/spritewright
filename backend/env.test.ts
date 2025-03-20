@@ -11,7 +11,7 @@ import {
   createFileWithContent,
   deleteFileIfExists,
 } from "../deno-common/file.ts";
-import { parse, validateEnvData } from "./env.ts";
+import { get, parse, validateEnvData } from "./env.ts";
 import { envVars } from "./env_vars.ts";
 
 describe("validateEnvFile", () => {
@@ -186,5 +186,46 @@ describe("parse", () => {
       Error,
       "Unknown env var: UNKNOWN_VAR",
     );
+  });
+});
+
+describe("get", () => {
+  const ENV_FILE = ".test-env";
+
+  beforeEach(async () => {
+    await deleteFileIfExists(ENV_FILE);
+    // Clear any existing env vars that might interfere with tests
+    Deno.env.delete("IS_DEVELOPMENT");
+    Deno.env.delete("IS_PRODUCTION");
+
+    await createFileWithContent(
+      ENV_FILE,
+      "IS_DEVELOPMENT=true\nIS_PRODUCTION=false",
+    );
+  });
+
+  afterEach(async () => {
+    await deleteFileIfExists(ENV_FILE);
+    // Clean up env vars
+    Deno.env.delete("IS_DEVELOPMENT");
+    Deno.env.delete("IS_PRODUCTION");
+
+    assertFalse(await exists(ENV_FILE));
+  });
+
+  it("should throw error when env var is not found", () => {
+    assertThrows(
+      () => {
+        parse(ENV_FILE);
+        get("UNKNOWN_VAR");
+      },
+      Error,
+      "Env var 'UNKNOWN_VAR' not found.",
+    );
+  });
+
+  it("should return correct value when env var is found", async () => {
+    await parse(ENV_FILE);
+    assertEquals(get("IS_DEVELOPMENT"), "true");
   });
 });

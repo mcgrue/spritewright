@@ -143,6 +143,10 @@ export const init = (name: EnvVarName): void => {
   parse(envFile);
 };
 
-// export const get(name: EnvVarName): string {
-//   return Deno.env.get(name);
-// }
+export const get = (name: EnvVarName): string => {
+  if (!_env[name]) {
+    throw new Error(`Env var '${name}' not found.`);
+  }
+
+  return _env[name];
+};
