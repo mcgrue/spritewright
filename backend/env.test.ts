@@ -11,7 +11,8 @@ import {
   createFileWithContent,
   deleteFileIfExists,
 } from "../deno-common/file.ts";
-import { envVars, parse, validateEnvData } from "./env.ts";
+import { parse, validateEnvData } from "./env.ts";
+import { envVars } from "./env_vars.ts";
 
 describe("validateEnvFile", () => {
   it("should parse basic KEY=VALUE pairs", () => {

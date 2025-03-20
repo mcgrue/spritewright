@@ -1,24 +1,5 @@
 import { exists } from "https://deno.land/std@0.224.0/fs/exists.ts";
-
-export type EnvVar = {
-  name: string;
-  description: string;
-  required?: boolean;
-  defaultValue?: string;
-};
-
-export const envVars: EnvVar[] = [
-  {
-    name: "IS_DEVELOPMENT",
-    description: "true if running in development mode",
-    required: true,
-  },
-  {
-    name: "IS_PRODUCTION",
-    description: "true if running in development mode",
-    required: true,
-  },
-];
+import { envVars } from "./env_vars.ts";
 
 export const VALID_ENV_NAME_REGEX = /^[a-zA-Z0-9_]+$/;
 
