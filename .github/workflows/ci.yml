@@ -1,3 +1,4 @@
+
 name: Deploy
 on:
   push:
@@ -28,6 +29,14 @@ jobs:
         with:
           deno-version: v2.x
 
+      - name: Set outputs
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Verify shortcode
+        run: |
+          echo ${{ steps.vars.outputs.sha_short }}
+
       - name: Build step
         run: |
           deno task build
@@ -56,7 +65,7 @@ jobs:
         run: |
           # replace GIT_VERSION_REPLACED_BY_CI_DO_NOT_CHANGE in backend/constants.ts with the 7-digit git sha
           $content = Get-Content "backend/constants.ts" -Raw
-          $gitSha = "${{ github.sha }}".Substring(0,7)
+          $gitSha = "${{ steps.vars.outputs.sha_short }}".Substring(0,7)
           $newContent = $content -replace "GIT_VERSION_REPLACED_BY_CI_DO_NOT_CHANGE", $gitSha
           Set-Content "backend/constants.ts" $newContent
           
@@ -114,3 +123,32 @@ jobs:
           echo "starting service"
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "sudo systemctl start spritewright.service"
 
+      - name: Notify Discord
+        if: always()
+        run: |
+          STATUS_COLOR=$([ "${{ job.status }}" == "success" ] && echo "3066993" || echo "15158332")
+          STATUS_EMOJI=$([ "${{ job.status }}" == "success" ] && echo "✅" || echo "❌")
+          STATUS_TEXT=$([ "${{ job.status }}" == "success" ] && echo "Deploy Successful - https://spritewright.com/" || echo "Deploy Failed")
+          
+          curl -X POST -H "Content-Type: application/json" \
+          -d '{
+            "username": "Staging Bot",
+            "avatar_url": "https://verge-rpg.com/assets/uploads/bottom-main/verge-48.png",
+            "content": "${STATUS_EMOJI} ${STATUS_TEXT}",
+            "embeds": [{
+              "color": ${STATUS_COLOR},
+              "fields": [
+                {
+                  "name": "Commit msg",
+                  "value": "${{ github.event.head_commit.message }}",
+                  "inline": true
+                },
+                {
+                  "name": "Github Link",
+                  "value": "${{ github.event.head_commit.url }}",
+                  "inline": true
+                }
+              ]
+            }]
+          }' \
+          ${{ secrets.DISCORD_WEBHOOK }}
