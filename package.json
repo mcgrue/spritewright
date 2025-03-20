@@ -14,7 +14,10 @@
 		"lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
 		"preview": "vite preview",
 		"test": "deno test --allow-all",
-		"test:debug": "deno test --inspect-brk --allow-all"
+		"test:debug": "deno test --inspect-brk --allow-all --inspect=127.0.0.1:9230",
+		"grue:vscode:debug": "bash ./scripts/test_vscode_debug.sh",
+		"grue:success": "curl -s http://localhost:22222/YES -o /dev/null 2>&1",
+		"grue:fail": "curl -s http://localhost:22222/NO -o /dev/null 2>&1"
 	},
 	"dependencies": {
 		"react": "^18.3.1",

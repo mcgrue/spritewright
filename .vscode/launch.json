@@ -2,33 +2,6 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Deno Test Debug - f5 on a specific test",
-      "type": "node",
-      "request": "launch",
-      "runtimeExecutable": "deno",
-      "runtimeArgs": [
-        "test",
-        "--inspect-brk",
-        "--allow-all",
-        "${file}"
-      ],
-      "attachSimplePort": 9229,
-      "console": "integratedTerminal"
-    },
-    {
-      "name": "Deno Test Debug All",
-      "type": "node",
-      "request": "launch",
-      "runtimeExecutable": "deno",
-      "runtimeArgs": [
-        "test",
-        "--inspect-brk",
-        "--allow-all"
-      ],
-      "attachSimplePort": 9229,
-      "console": "integratedTerminal"
-    },
-    {
       "name": "Attach to Backend",
       "type": "node",
       "request": "attach",
@@ -39,6 +12,13 @@
       "type": "node",
       "request": "attach",
       "port": 9231
+    },
+    {
+      "name": "Run Single Test",
+      "type": "node",
+      "request": "attach",
+      "port": 9230,
+      "preLaunchTask": "test-single-file"
     }
   ],
   "compounds": [

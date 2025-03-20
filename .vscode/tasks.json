@@ -60,6 +60,34 @@
         "reveal": "always"
       },
       "isBackground": true
+    },
+    {
+      "label": "start-dev-servers",
+      "dependsOrder": "parallel",
+      "dependsOn": [
+        "start-backend",
+        "start-frontend",
+        "start-app"
+      ]
+    },
+    {
+      "label": "test-single-file",
+      "type": "shell",
+      "command": "yarn grue:vscode:debug \"${fileDirname}${pathSeparator}${fileBasename}\"",
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^\\[\\d+\\] found available backend port: (\\d+)$",
+          "file": 1,
+          "location": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*deno test.*",
+          "endsPattern": "(.*with exit code.*|Deno is waiting for debugger to connect\\.)"
+        }
+      }
     }
   ]
 }
