@@ -1,3 +1,5 @@
+import { exists } from "https://deno.land/std@0.224.0/fs/exists.ts";
+
 export type EnvVar = {
   name: string;
   description: string;
@@ -35,7 +37,7 @@ export type EnvVarName = typeof envVars[number]["name"];
  * @returns a dict of KEY=VALUE pairs
  * @throws Error if any of the above cases is invalid
  */
-export const validateEnvFile = (contents: string): Record<string, string> => {
+export const validateEnvData = (contents: string): Record<string, string> => {
   contents = contents + "\n";
   const result: Record<string, string> = {};
 
@@ -75,17 +77,68 @@ export const validateEnvFile = (contents: string): Record<string, string> => {
   return result;
 };
 
-// export const parse(): void {
-//   // if there's a .env file in the project's base directory, load it
-// 	if (await Deno.stat(".env")) {
-// 		console.log("found .env file: loading...");
+let _env: Record<string, string> = {};
 
-// 		validate
+export const parse = async (
+  filePath: string,
+): Promise<Record<string, string>> => {
+  const parseDotEnvIfPresent = async (): Promise<Record<string, string>> => {
+    // if there's a .env file in the project's base directory, load it
+    if (await exists(filePath)) {
+      console.log(`found ${filePath} file: loading...`);
 
-// 	} else {
-// 		console.log("no .env file found");
-// 	}
-// }
+      const contents = await Deno.readTextFile(filePath);
+      return validateEnvData(contents);
+    } else {
+      console.log(`no ${filePath} file found`);
+      return {};
+    }
+  };
+
+  const dotEnv = await parseDotEnvIfPresent();
+
+  // error if there are any env vars in the .env file that are not in envVars
+  Object.keys(dotEnv).forEach((key) => {
+    if (!envVars.some((envVar) => envVar.name === key)) {
+      throw new Error(`Unknown env var: ${key}`);
+    }
+  });
+
+  _env = {
+    ...dotEnv,
+    ...Deno.env.toObject(),
+  };
+
+  // prune any keys in _env that are not in envVars
+  _env = Object.fromEntries(
+    Object.entries(_env).filter(([key]) =>
+      envVars.some((envVar) => envVar.name === key)
+    ),
+  );
+
+  // print out any missing required env vars
+  let missing = 0;
+  envVars.forEach((envVar) => {
+    if (envVar.required && !_env[envVar.name]) {
+      console.error(`Missing required env var: ${envVar.name}`);
+      ++missing;
+    }
+  });
+
+  if (missing > 0) {
+    throw new Error(`Missing required env vars: ${missing}`);
+  }
+
+  envVars.forEach((envVar) => {
+    if (_env[envVar.name] && dotEnv[envVar.name] && Deno.env.get(envVar.name)) {
+      console.error(
+        `Env var '${envVar.name}' in both .env and system environment; using system environment value`,
+      );
+    }
+  });
+
+  return _env;
+};
 
 // export const get(name: EnvVarName): string {
 //   return Deno.env.get(name);
