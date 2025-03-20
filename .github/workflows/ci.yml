@@ -19,6 +19,20 @@ jobs:
       - name: Clone repository
         uses: actions/checkout@v4
 
+      # Add these steps before any npm/yarn commands
+      - name: Install SQLite3 build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3 make gcc g++ sqlite3 libsqlite3-dev node-gyp
+
+      - name: Rebuild SQLite3
+        if: runner.os == 'Linux'
+        run: |
+          npm install sqlite3 --build-from-source
+          # or if using yarn:
+          # yarn add sqlite3 --build-from-source
+
       - name: Create port files
         run: |
           echo "8025" > .port_backend
