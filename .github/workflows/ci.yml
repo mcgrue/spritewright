@@ -42,14 +42,14 @@ jobs:
           deno task build
           chmod -R g+w *
           chmod -R g+w .*
-      
+
       - name: Test step
         run: "yarn test"
 
       - name: Fail if there are any .ts or .tsx files in the project without a .test.ts or .test.tsx file
         shell: pwsh
         run: ./scripts/check-test-files.ps1
-      
+
       - name: Fail if required shiboleths for replacement are missing
         shell: pwsh
         run: |
@@ -60,7 +60,7 @@ jobs:
               exit 1
           }
 
-      - name: Replace ci variables 
+      - name: Replace ci variables
         shell: pwsh
         run: |
           # replace GIT_VERSION_REPLACED_BY_CI_DO_NOT_CHANGE in backend/constants.ts with the 7-digit git sha
@@ -68,7 +68,7 @@ jobs:
           $gitSha = "${{ steps.vars.outputs.sha_short }}".Substring(0,7)
           $newContent = $content -replace "GIT_VERSION_REPLACED_BY_CI_DO_NOT_CHANGE", $gitSha
           Set-Content "backend/constants.ts" $newContent
-          
+
           # replace DEPLOY_TIMESTAMP_REPLACED_BY_CI_DO_NOT_CHANGE in backend/constants.ts with the ISO timestamp for now
           $timestamp = [DateTime]::UtcNow.ToString("o")
           $newContent = $newContent -replace "DEPLOY_TIMESTAMP_REPLACED_BY_CI_DO_NOT_CHANGE", $timestamp
@@ -86,14 +86,14 @@ jobs:
           echo "cleaning up stage"
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "rm -rf ~/spritewright || true"
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "mkdir ~/spritewright || true"
-         
+
           echo "uploading to stage"
           scp -r dist/* ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/spritewright/front
           rsync -av ./* ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/spritewright/back
 
           echo "stopping service"
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "sudo systemctl stop spritewright.service"
-          
+
           echo "waiting for service to stop (timeout 1 minute)"
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "
             timeout=60
@@ -107,11 +107,11 @@ jobs:
               ((elapsed++))
             done
           "
-          
+
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "ps aux | grep deno"
-          
+
           echo "deleting production"
-          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "sudo rm -rf ${{ secrets.BASE_DEPLOY_PATH }}"					
+          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "sudo rm -rf ${{ secrets.BASE_DEPLOY_PATH }}"
 
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "mkdir ${{ secrets.FRONTEND_DEPLOY_PATH }} || true"
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "mkdir ${{ secrets.BACKEND_DEPLOY_PATH }} || true"
@@ -119,7 +119,7 @@ jobs:
           echo "copying to production"
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "cp -r ~/spritewright/front/* ${{ secrets.FRONTEND_DEPLOY_PATH }}"
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "cp -r ~/spritewright/back/* ${{ secrets.BACKEND_DEPLOY_PATH }}"
-          
+
           echo "starting service"
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "sudo systemctl start spritewright.service"
 
@@ -129,26 +129,26 @@ jobs:
           STATUS_COLOR=$([ "${{ job.status }}" == "success" ] && echo "3066993" || echo "15158332")
           STATUS_EMOJI=$([ "${{ job.status }}" == "success" ] && echo "✅" || echo "❌")
           STATUS_TEXT=$([ "${{ job.status }}" == "success" ] && echo "Deploy Successful - https://spritewright.com/" || echo "Deploy Failed")
-          
+
           curl -X POST -H "Content-Type: application/json" \
-          -d '{
-            "username": "Staging Bot",
-            "avatar_url": "https://verge-rpg.com/assets/uploads/bottom-main/verge-48.png",
-            "content": "${STATUS_EMOJI} ${STATUS_TEXT}",
-            "embeds": [{
-              "color": ${STATUS_COLOR},
-              "fields": [
+          -d "{
+            \"username\": \"Staging Bot\",
+            \"avatar_url\": \"https://verge-rpg.com/assets/uploads/bottom-main/verge-48.png\",
+            \"content\": \"$STATUS_EMOJI $STATUS_TEXT\",
+            \"embeds\": [{
+              \"color\": $STATUS_COLOR,
+              \"fields\": [
                 {
-                  "name": "Commit msg",
-                  "value": "${{ github.event.head_commit.message }}",
-                  "inline": true
+                  \"name\": \"Commit msg\",
+                  \"value\": \"${{ github.event.head_commit.message }}\",
+                  \"inline\": true
                 },
                 {
-                  "name": "Github Link",
-                  "value": "${{ github.event.head_commit.url }}",
-                  "inline": true
+                  \"name\": \"Github Link\",
+                  \"value\": \"${{ github.event.head_commit.url }}\",
+                  \"inline\": true
                 }
               ]
             }]
-          }' \
+          }" \
           ${{ secrets.DISCORD_WEBHOOK }}
