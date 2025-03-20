@@ -2,6 +2,7 @@
 .port_frontend
 
 .env
+db/*
 
 # Logs
 logs
