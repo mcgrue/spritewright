@@ -43,3 +43,20 @@ repos:
       - id: commitizen-branch
         stages:
           - post-commit
+
+  - repo: https://github.com/mcgrue/pre-commit-hook-MAKE-SOME-NOISE #needs to be the last one in the list
+    rev: 71ef4ac
+    hooks:
+      - id: make-some-noise
+        # language: python
+        args: [
+          --url-alive,
+          "http://SWORDFISH:22222",
+          --url-fail,
+          "http://swordfish:22222/SDL_assert",
+          --url-pass,
+          "http://SWORDFISH:22222/DOCTEST_ALL_TESTS_PASS",
+          --url-error,
+          "http://swordfish:22222/SDL_assert",
+        ]
+        # additional_dependencies: [requests, argparse]
