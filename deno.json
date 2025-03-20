@@ -3,7 +3,9 @@
 		"@oak/oak": "jsr:@oak/oak@^17.1.3",
 		"@tajpouria/cors": "jsr:@tajpouria/cors@^1.2.1",
 		"@webview/webview": "jsr:@webview/webview@^0.9.0",
-		"react-router-dom": "npm:react-router-dom@^6.26.2"
+		"react-router-dom": "npm:react-router-dom@^6.26.2",
+		"sequelize": "npm:sequelize@^6.37.1",
+		"sqlite3": "npm:sqlite3@^5.1.7"
 	},
 	"compilerOptions": {
 		"jsx": "react-jsx",
