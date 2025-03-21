@@ -10,5 +10,7 @@
 	"frontend/main.tsx",
 	"frontend/types.ts",
 	"frontend/vite-env.d.ts",
+	"scripts/check-test-assertions.ts",
+	"scripts/check-test-files.ts",
 	"vite.config.ts"
 ]

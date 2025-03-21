@@ -20,7 +20,7 @@ repos:
     hooks:
       - id: check-test-files
         name: Check test files exist
-        entry: powershell -NonInteractive -NoProfile -Command "& {./scripts/check-test-files.ps1 *>&1 | Select-Object -Last 1; exit $LASTEXITCODE}"
+        entry: deno run --allow-all scripts/check-test-files.ts
         language: system
         pass_filenames: false
         types: [file]

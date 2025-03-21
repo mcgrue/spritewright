@@ -66,9 +66,11 @@ jobs:
       - name: Test step
         run: "yarn test"
 
+      - name: Check test assertions
+        run: "deno run --allow-all scripts/check-test-assertions.ts"
+
       - name: Fail if there are any .ts or .tsx files in the project without a .test.ts or .test.tsx file
-        shell: pwsh
-        run: ./scripts/check-test-files.ps1
+        run: "deno run --allow-all scripts/check-test-files.ts"
 
       - name: Fail if required shiboleths for replacement are missing
         shell: pwsh
