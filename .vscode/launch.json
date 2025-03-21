@@ -5,20 +5,38 @@
       "name": "Attach to Backend",
       "type": "node",
       "request": "attach",
-      "port": 9230
+      "port": 9230,
+      "skipFiles": [
+        "**/@std/**",
+        "**/std@*/**",
+        "**runtime\\**",
+        "**runtime/**"
+      ]
     },
     {
       "name": "Attach to App",
       "type": "node",
       "request": "attach",
-      "port": 9231
+      "port": 9231,
+      "skipFiles": [
+        "**/@std/**",
+        "**/std@*/**",
+        "**runtime\\**",
+        "**runtime/**"
+      ]
     },
     {
       "name": "Run Single Test",
       "type": "node",
       "request": "attach",
       "port": 9230,
-      "preLaunchTask": "test-single-file"
+      "preLaunchTask": "test-single-file",
+      "skipFiles": [
+        "**/@std/**",
+        "**/std@*/**",
+        "**runtime\\**",
+        "**runtime/**"
+      ]
     }
   ],
   "compounds": [
