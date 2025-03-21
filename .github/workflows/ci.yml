@@ -27,7 +27,7 @@ jobs:
       - name: Install more stuff
         run: |
           sudo npm install -g node-gyp
-          deno --allow-scripts add npm:sequelize
+          deno add --allow-scripts npm:sequelize
 
       - name: Create port files
         run: |
