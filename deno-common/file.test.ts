@@ -74,8 +74,16 @@ describe("file utilities", () => {
     });
 
     it("should not throw error for non-existent file", async () => {
-      // Should not throw
-      await deleteFileIfExists("non_existent_file.txt");
+      let errored = false;
+
+      try {
+        await deleteFileIfExists("non_existent_file.txt");
+      } catch (e) {
+        console.error(e);
+        errored = true;
+      }
+
+      assertEquals(errored, false);
     });
   });
 
