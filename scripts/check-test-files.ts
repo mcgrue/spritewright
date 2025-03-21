@@ -1,12 +1,13 @@
+import { toLines } from "@std/streams/unstable-to-lines";
 import { walk } from "jsr:@std/fs/walk";
-import { readLines } from "jsr:@std/io";
 import { relative } from "jsr:@std/path";
 
 async function readGitignorePatterns(): Promise<string[]> {
   const patterns: string[] = [];
   try {
     const file = await Deno.open(".gitignore");
-    for await (const line of readLines(file)) {
+    const lines = toLines(file.readable);
+    for await (const line of lines) {
       if (line && !line.startsWith("#")) {
         patterns.push(line);
       }
