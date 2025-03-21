@@ -1,7 +1,7 @@
 import { ensureDirSync } from "https://deno.land/std/fs/ensure_dir.ts";
 import { DataTypes, Model, Sequelize } from "npm:sequelize";
 import "npm:sqlite3";
-import { deleteFileIfExists } from "../deno-common/file.ts";
+import { deleteFileIfExists } from "../../deno-common/file.ts";
 
 const DB_DIR = "./db";
 const DB_PATH = `${DB_DIR}/database.sqlite`;
