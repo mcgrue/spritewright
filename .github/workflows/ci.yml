@@ -19,15 +19,20 @@ jobs:
       - name: Clone repository
         uses: actions/checkout@v4
 
-      - name: Create port files
-        run: |
-          echo "8025" > .port_backend
-          echo "5000" > .port_frontend
-
       - name: Install Deno
         uses: denoland/setup-deno@v1
         with:
           deno-version: v2.x
+
+      - name: Install more stuff
+        run: |
+          sudo npm install -g node-gyp
+          deno --allow-scripts add npm:sequelize
+
+      - name: Create port files
+        run: |
+          echo "8025" > .port_backend
+          echo "5000" > .port_frontend
 
       - name: use actions--context
         uses: qoomon/actions--context@v4
