@@ -50,7 +50,7 @@ jobs:
           chmod -R g+w .*
 
       - name: Test step
-        run: "yarn test"
+        run: "deno test --allow-all --fail-fast=1"
 
       - name: Check test assertions
         run: "deno run --allow-all scripts/check-test-assertions.ts"
