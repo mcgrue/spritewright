@@ -112,7 +112,11 @@ if (import.meta.main) {
   try {
     await main();
   } catch (error) {
-    console.error(error.message);
+    if (error instanceof Error) {
+      console.error(error.stack);
+    } else {
+      console.error(error);
+    }
     Deno.exit(1);
   }
 }
