@@ -21,3 +21,7 @@ app. The app will wait for a debugger to connect.
 
 You can `CTRL-SHIFT-I` in the webview to pop up an inspector window to inspect
 frontend things.
+
+# DB Migration
+
+`deno -A --node-modules-dir npm:drizzle-kit generate`
