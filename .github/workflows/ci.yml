@@ -24,11 +24,6 @@ jobs:
         with:
           deno-version: v2.x
 
-      - name: Install more stuff
-        run: |
-          sudo npm install -g node-gyp
-          deno add --allow-scripts npm:sequelize
-
       - name: Create port files
         run: |
           echo "8025" > .port_backend
